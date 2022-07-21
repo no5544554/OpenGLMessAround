@@ -1,0 +1,7 @@
+freeglut/
+bin/
+obj/
+freeglut.dll
+*.save-failed
+*.cbp
+*.depend
