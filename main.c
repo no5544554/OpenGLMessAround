@@ -37,6 +37,20 @@ struct
 } timer;
 
 
+/**************************
+ * Function declarations
+ **************************/
+void MakeCheckerboard(void);
+void DrawWorld(void);
+void CreateLight(void);
+
+void DrawSky(void);
+void DrawGrid(void);
+void DrawCylinder(void);
+void DrawGun(void);
+void DrawCube(void);
+
+
 void MakeCheckerboard(void)
 {
     int x, y, c;
@@ -56,8 +70,6 @@ void MakeCheckerboard(void)
 
 void DrawWorld(void)
 {
-    int i;
-
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -65,157 +77,38 @@ void DrawWorld(void)
     glLoadIdentity();
     gluOrtho2D(0, 640, 480, 0);
 
-    /**
-     * Draw the sky
-     */
+    /* Draw the sky */
     glDisable(GL_LIGHTING);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glColor3f(0.3f, 0.7f, 1.0f);
-    glBegin(GL_QUADS);
-    glVertex2f(0, 240);
-    glVertex2f(640, 240);
-    glVertex2f(640, 0);
-    glVertex2f(0, 0);
-    glEnd();
+    DrawSky();
 
-    glColor3f(0.2f, 0.5f, 0.1f);
-    glBegin(GL_QUADS);
-    glVertex2f(0, 480);
-    glVertex2f(640, 480);
-    glVertex2f(640, 240);
-    glVertex2f(0, 240);
-    glEnd();
-
-    // Draw the world
+    /* Draw the world */
     glClear(GL_DEPTH_BUFFER_BIT);
     glEnable(GL_LIGHTING);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(60.0, (double)SCREEN_WIDTH / (double)SCREEN_HEIGHT, 1.5, 50.0);
 
-
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glRotatef(pa, 0.0f, 1.0f, 0.0f);
-
-
     glTranslatef(-px, -py, -pz);
 
-    // Draw grid
-    glTranslatef(-10, -0.5, -10);
-    for (i = 0; i < 40; i++)
-    {
-        glPushMatrix();
-        glColor3f(0.0f, 0.0f, 0.0f);
-        if (i < 20)
-        {
-            glTranslatef(0.0f, 0.0f, i);
-        }
-        else
-        {
-            glTranslatef(i - 20, 0.0f, 0);
-            glRotatef(-90, 0.0f, 1.0f, 0.0f);
-        }
-        glBegin(GL_LINES);
-        glVertex3f(-20, 0.0f, 0.0f);
-        glVertex3f(20, 0.0f, 0.0f);
-        glEnd();
-        glPopMatrix();
-    }
+    /* Draw Grid */
+    DrawGrid();
 
-    // Draw brown cylinder
-    GLfloat mat_diffuse[] = { 0.8, 0.4, 0.3, 1.0 };
-    GLfloat mat_ambient[] = { 0.3, 0.3, 0.3, 1.0 };
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+    /* Draw brown cylinder */
+    DrawCylinder();
 
-    glColor3f(0.5f, 0.25f, 0.2f);
-    glPushMatrix();
-    glTranslatef(5, 4, 5);
-    glScalef(0.5f, 4.0f, 0.5f);
-    glRotatef(90, 1, 0, 0);
-    glutSolidCylinder(1.0, 1.0, 16, 1);
-    glPopMatrix();
+    /* Draw checkered cube */
+    DrawCube();
 
-    // draw checkercube
-    glEnable(GL_TEXTURE_2D);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glPushMatrix();
-    glTranslatef(-5, 2, 0);
+    /* Draw "gun" cylinder */
+    DrawGun();
 
-    glPushMatrix();
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f);   glVertex3f(-1.0, -1.0, 1.0);
-    glTexCoord2f(0.0f, 1.0f);   glVertex3f(1.0, -1.0, 1.0);
-    glTexCoord2f(1.0f, 1.0f);   glVertex3f(1.0, 1.0, 1.0);
-    glTexCoord2f(1.0f, 0.0f);   glVertex3f(-1.0, 1.0, 1.0);
-    glEnd();
-    glPopMatrix();
-
-    glRotatef(90, 0, 1, 0);
-
-    glPushMatrix();
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f);   glVertex3f(-1.0, -1.0, 1.0);
-    glTexCoord2f(0.0f, 1.0f);   glVertex3f(1.0, -1.0, 1.0);
-    glTexCoord2f(1.0f, 1.0f);   glVertex3f(1.0, 1.0, 1.0);
-    glTexCoord2f(1.0f, 0.0f);   glVertex3f(-1.0, 1.0, 1.0);
-    glEnd();
-    glPopMatrix();
-
-    glRotatef(90, 0, 1, 0);
-
-    glPushMatrix();
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f);   glVertex3f(-1.0, -1.0, 1.0);
-    glTexCoord2f(0.0f, 1.0f);   glVertex3f(1.0, -1.0, 1.0);
-    glTexCoord2f(1.0f, 1.0f);   glVertex3f(1.0, 1.0, 1.0);
-    glTexCoord2f(1.0f, 0.0f);   glVertex3f(-1.0, 1.0, 1.0);
-    glEnd();
-    glPopMatrix();
-
-    glRotatef(90, 0, 1, 0);
-
-    glPushMatrix();
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f);   glVertex3f(-1.0, -1.0, 1.0);
-    glTexCoord2f(0.0f, 1.0f);   glVertex3f(1.0, -1.0, 1.0);
-    glTexCoord2f(1.0f, 1.0f);   glVertex3f(1.0, 1.0, 1.0);
-    glTexCoord2f(1.0f, 0.0f);   glVertex3f(-1.0, 1.0, 1.0);
-    glEnd();
-    glPopMatrix();
-
-    glDisable(GL_TEXTURE_2D);
-    glPopMatrix();
-
-    // Draw "gun"
-    GLfloat mat_diffuse2[] = { 0.5, 0.4, 0.5, 1.0 };
-    GLfloat mat_ambient2[] = { 0.3, 0.3, 0.3, 1.0 };
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse2);
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient2);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glColor3f(0.5f, 0.4f, 0.5f);
-
-    glLoadIdentity();
-    glPushMatrix();
-    glTranslatef(1.5f, -1.5f, -4.0f);
-    glScalef(0.5f, 0.5f, 3.0f);
-    glutSolidCylinder(1.0, 1.0, 16, 1);
-    glPopMatrix();
-
-
-
-/*
-    glPushMatrix();
-    glTranslatef(px - 1.0f, 0.0f, pz);
-    glScalef(1.0f, 1.0f, 1.0f);
-    glutSolidCube(1.0);
-    glPopMatrix();
-*/
+    /* Flush */
     glFlush();
 }
+
 
 void Update(void)
 {
@@ -272,6 +165,7 @@ void Update(void)
     }
 }
 
+
 void Display(void)
 {
 
@@ -291,20 +185,24 @@ void Display(void)
 
 }
 
+
 void RunMainLoop(int val)
 {
 
 }
+
 
 void KeyboardDown(unsigned char key, int x, int y)
 {
     keys[key] = TRUE;
 }
 
+
 void KeyboardUp(unsigned char key, int x, int y)
 {
     keys[key] = FALSE;
 }
+
 
 void SpecialDown(int key, int x, int y)
 {
@@ -312,11 +210,13 @@ void SpecialDown(int key, int x, int y)
     if (key == GLUT_KEY_RIGHT) rightArrow = TRUE;
 }
 
+
 void SpecialUp(int key, int x, int y)
 {
     if (key == GLUT_KEY_LEFT) leftArrow = FALSE;
     if (key == GLUT_KEY_RIGHT) rightArrow = FALSE;
 }
+
 
 int main(int argc, char * argv[])
 {
@@ -328,7 +228,7 @@ int main(int argc, char * argv[])
     glutCreateWindow("OpenGL");
 
 
-    // Create texture
+    /* Create texture */
     MakeCheckerboard();
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glGenTextures(1, &texture);
@@ -340,7 +240,7 @@ int main(int argc, char * argv[])
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, CHECKERBOARD_WIDTH, CHECKERBOARD_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, checkerBoard);
 
-    // set projection
+    /* set projection */
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(60.0, (double)SCREEN_WIDTH / (double)SCREEN_HEIGHT, 0.5, 50.0);
@@ -348,17 +248,9 @@ int main(int argc, char * argv[])
 
     glShadeModel(GL_SMOOTH);
 
-    GLfloat light_ambient[] = { 0.2, 0.2, 0.2, 1.0 };
-    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat light_position[] = { 1.0, 10.0, 1.0, 0.0 };
+    CreateLight();
 
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
-    glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CCW);
@@ -371,4 +263,159 @@ int main(int argc, char * argv[])
     glutSpecialUpFunc(SpecialUp);
     glutMainLoop();
     return 0;
+}
+
+
+void CreateLight(void)
+{
+    GLfloat light_ambient[] = { 0.2, 0.2, 0.2, 1.0 };
+    GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat light_position[] = { 1.0, 10.0, 1.0, 0.0 };
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glEnable(GL_LIGHT0);
+}
+
+
+void DrawSky(void)
+{
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glColor3f(0.3f, 0.7f, 1.0f);
+    glBegin(GL_QUADS);
+    glVertex2f(0, 240);
+    glVertex2f(640, 240);
+    glVertex2f(640, 0);
+    glVertex2f(0, 0);
+    glEnd();
+
+    glColor3f(0.2f, 0.5f, 0.1f);
+    glBegin(GL_QUADS);
+    glVertex2f(0, 480);
+    glVertex2f(640, 480);
+    glVertex2f(640, 240);
+    glVertex2f(0, 240);
+    glEnd();
+}
+
+
+void DrawGrid(void)
+{
+    int i;
+
+    glTranslatef(-10, -0.5, -10);
+    for (i = 0; i < 40; i++)
+    {
+        glPushMatrix();
+        glColor3f(0.0f, 0.0f, 0.0f);
+        if (i < 20)
+        {
+            glTranslatef(0.0f, 0.0f, i);
+        }
+        else
+        {
+            glTranslatef(i - 20, 0.0f, 0);
+            glRotatef(-90, 0.0f, 1.0f, 0.0f);
+        }
+        glBegin(GL_LINES);
+        glVertex3f(-20, 0.0f, 0.0f);
+        glVertex3f(20, 0.0f, 0.0f);
+        glEnd();
+        glPopMatrix();
+    }
+}
+
+
+void DrawCylinder(void)
+{
+    GLfloat mat_diffuse[] = { 0.8, 0.4, 0.3, 1.0 };
+    GLfloat mat_ambient[] = { 0.3, 0.3, 0.3, 1.0 };
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+
+    glColor3f(0.5f, 0.25f, 0.2f);
+    glPushMatrix();
+    glTranslatef(5, 4, 5);
+    glScalef(0.5f, 4.0f, 0.5f);
+    glRotatef(90, 1, 0, 0);
+    glutSolidCylinder(1.0, 1.0, 16, 1);
+    glPopMatrix();
+}
+
+
+void DrawGun(void)
+{
+    GLfloat mat_diffuse[] = { 0.5, 0.4, 0.5, 1.0 };
+    GLfloat mat_ambient[] = { 0.3, 0.3, 0.3, 1.0 };
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glColor3f(0.5f, 0.4f, 0.5f);
+
+    glLoadIdentity();
+    glPushMatrix();
+    glTranslatef(1.5f, -1.5f, -4.0f);
+    glScalef(0.5f, 0.5f, 3.0f);
+    glutSolidCylinder(1.0, 1.0, 16, 1);
+    glPopMatrix();
+}
+
+
+void DrawCube(void)
+{
+    glEnable(GL_TEXTURE_2D);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glPushMatrix();
+    glTranslatef(-5, 2, 0);
+
+    glPushMatrix();
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f);   glVertex3f(-1.0, -1.0, 1.0);
+    glTexCoord2f(0.0f, 1.0f);   glVertex3f(1.0, -1.0, 1.0);
+    glTexCoord2f(1.0f, 1.0f);   glVertex3f(1.0, 1.0, 1.0);
+    glTexCoord2f(1.0f, 0.0f);   glVertex3f(-1.0, 1.0, 1.0);
+    glEnd();
+    glPopMatrix();
+
+    glRotatef(90, 0, 1, 0);
+
+    glPushMatrix();
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f);   glVertex3f(-1.0, -1.0, 1.0);
+    glTexCoord2f(0.0f, 1.0f);   glVertex3f(1.0, -1.0, 1.0);
+    glTexCoord2f(1.0f, 1.0f);   glVertex3f(1.0, 1.0, 1.0);
+    glTexCoord2f(1.0f, 0.0f);   glVertex3f(-1.0, 1.0, 1.0);
+    glEnd();
+    glPopMatrix();
+
+    glRotatef(90, 0, 1, 0);
+
+    glPushMatrix();
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f);   glVertex3f(-1.0, -1.0, 1.0);
+    glTexCoord2f(0.0f, 1.0f);   glVertex3f(1.0, -1.0, 1.0);
+    glTexCoord2f(1.0f, 1.0f);   glVertex3f(1.0, 1.0, 1.0);
+    glTexCoord2f(1.0f, 0.0f);   glVertex3f(-1.0, 1.0, 1.0);
+    glEnd();
+    glPopMatrix();
+
+    glRotatef(90, 0, 1, 0);
+
+    glPushMatrix();
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f);   glVertex3f(-1.0, -1.0, 1.0);
+    glTexCoord2f(0.0f, 1.0f);   glVertex3f(1.0, -1.0, 1.0);
+    glTexCoord2f(1.0f, 1.0f);   glVertex3f(1.0, 1.0, 1.0);
+    glTexCoord2f(1.0f, 0.0f);   glVertex3f(-1.0, 1.0, 1.0);
+    glEnd();
+    glPopMatrix();
+
+    glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
 }
