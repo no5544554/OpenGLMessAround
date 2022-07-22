@@ -6,9 +6,11 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
+#define SCREEN_WIDTH 1280
+#define SCREEN_HEIGHT 720
 #define FPS 50
+
+#define ESCAPE_KEY 27
 
 #define CHECKERBOARD_WIDTH  64
 #define CHECKERBOARD_HEIGHT 64
@@ -16,14 +18,14 @@ static GLubyte checkerBoard[CHECKERBOARD_WIDTH * CHECKERBOARD_HEIGHT][4];
 
 
 /* TODO: Turn into a struct */
-float px = 0.0f;
-float pz = 0.0f;
-float py = 1.0f;
-float pa = 0.0f;
+float px  = 0.0f;
+float pz  = 0.0f;
+float py  = 1.0f;
+float pa  = 0.0f;
+float pav = 0.0f;
 
 BOOL keys[256];
-
-BOOL leftArrow, rightArrow;
+BOOL leftArrow, rightArrow, upArrow, downArrow;
 
 #define DEG_TO_RAD 0.01745329
 #define NORMALIZED 0.707107
@@ -35,6 +37,8 @@ struct
     int start;
     int end;
 } timer;
+
+int window_ID;
 
 
 /**************************
@@ -90,17 +94,30 @@ void DrawWorld(void)
     glDisable(GL_LIGHTING);
     DrawSky();
 
+
     /* Draw the world */
     glClear(GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_LIGHTING);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60.0, (double)SCREEN_WIDTH / (double)SCREEN_HEIGHT, 1.5, 50.0);
+    gluPerspective(60.0, (double)SCREEN_WIDTH / (double)SCREEN_HEIGHT, 0.1, 100.0);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    glRotatef(pav, 1.0f, 0.0f, 0.0f);
     glRotatef(pa, 0.0f, 1.0f, 0.0f);
     glTranslatef(-px, -py, -pz);
+
+    /* Draw the ground*/
+    glColor3f(0.2f, 0.5f, 0.1f);
+    glPushMatrix();
+    glBegin(GL_QUADS);
+    glVertex3f(-50, 0, 50);
+    glVertex3f(50, 0, 50);
+    glVertex3f(50, 0, -50);
+    glVertex3f(-50, 0, -50);
+    glEnd();
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
 
     /* Draw Grid */
     DrawGrid();
@@ -172,6 +189,21 @@ void Update(void)
         pa -= 2.0f;
         if (pa < 0) pa += 360;
     }
+    if (upArrow)
+    {
+        pav -= 2.0f;
+        if (pav < -90) pav = -90;
+    }
+    else if (downArrow)
+    {
+        pav += 2.0f;
+        if (pav > 90) pav = 90;
+    }
+
+    if (keys[ESCAPE_KEY])
+    {
+        glutLeaveMainLoop();
+    }
 }
 
 
@@ -215,15 +247,41 @@ void KeyboardUp(unsigned char key, int x, int y)
 
 void SpecialDown(int key, int x, int y)
 {
-    if (key == GLUT_KEY_LEFT) leftArrow = TRUE;
-    if (key == GLUT_KEY_RIGHT) rightArrow = TRUE;
+    if (key == GLUT_KEY_LEFT)   leftArrow  = TRUE;
+    if (key == GLUT_KEY_RIGHT)  rightArrow = TRUE;
+    if (key == GLUT_KEY_UP)     upArrow    = TRUE;
+    if (key == GLUT_KEY_DOWN)   downArrow  = TRUE;
+
+
 }
 
 
 void SpecialUp(int key, int x, int y)
 {
-    if (key == GLUT_KEY_LEFT) leftArrow = FALSE;
-    if (key == GLUT_KEY_RIGHT) rightArrow = FALSE;
+    if (key == GLUT_KEY_LEFT)   leftArrow  = FALSE;
+    if (key == GLUT_KEY_RIGHT)  rightArrow = FALSE;
+    if (key == GLUT_KEY_UP)     upArrow    = FALSE;
+    if (key == GLUT_KEY_DOWN)   downArrow  = FALSE;
+}
+
+
+void MouseMove(int x, int y)
+{
+    int centerX, centerY;
+    int dx, dy;
+
+    centerX = glutGet(GLUT_WINDOW_WIDTH) / 2;
+    centerY = glutGet(GLUT_WINDOW_HEIGHT) / 2;
+
+    dx = x - centerX;
+    dy = y - centerY;
+
+    if (dx != 0 || dy != 0)
+    {
+        pa += dx * 0.2f;
+        pav += dy * 0.2f;
+        glutWarpPointer(centerX, centerY);
+    }
 }
 
 
@@ -234,7 +292,8 @@ int main(int argc, char * argv[])
 
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-    glutCreateWindow("OpenGL");
+    window_ID = glutCreateWindow("OpenGL");
+    glutSetCursor(GLUT_CURSOR_NONE);
 
 
     /* Create texture */
@@ -270,6 +329,7 @@ int main(int argc, char * argv[])
     glutKeyboardUpFunc(KeyboardUp);
     glutSpecialFunc(SpecialDown);
     glutSpecialUpFunc(SpecialUp);
+    glutPassiveMotionFunc(MouseMove);
     glutMainLoop();
     return 0;
 }
@@ -297,19 +357,21 @@ void DrawSky(void)
     glLoadIdentity();
     glColor3f(0.3f, 0.7f, 1.0f);
     glBegin(GL_QUADS);
-    glVertex2f(0, 240);
-    glVertex2f(640, 240);
+    glVertex2f(0, 480);
+    glVertex2f(640, 480);
     glVertex2f(640, 0);
     glVertex2f(0, 0);
     glEnd();
 
+    /*
     glColor3f(0.2f, 0.5f, 0.1f);
     glBegin(GL_QUADS);
     glVertex2f(0, 480);
     glVertex2f(640, 480);
     glVertex2f(640, 240);
     glVertex2f(0, 240);
-    glEnd();
+    glEnd();*/
+
 }
 
 
@@ -324,11 +386,11 @@ void DrawGrid(void)
         glColor3f(0.0f, 0.0f, 0.0f);
         if (i < 20)
         {
-            glTranslatef(0.0f, 0.0f, i);
+            glTranslatef(0.0f, 0.6f, i);
         }
         else
         {
-            glTranslatef(i - 20, 0.0f, 0);
+            glTranslatef(i - 20, 0.6f, 0);
             glRotatef(-90, 0.0f, 1.0f, 0.0f);
         }
         glBegin(GL_LINES);
@@ -415,6 +477,29 @@ void DrawCube(void)
     glPopMatrix();
 
     glRotatef(90, 0, 1, 0);
+
+    glPushMatrix();
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f);   glVertex3f(-1.0, -1.0, 1.0);
+    glTexCoord2f(0.0f, 1.0f);   glVertex3f(1.0, -1.0, 1.0);
+    glTexCoord2f(1.0f, 1.0f);   glVertex3f(1.0, 1.0, 1.0);
+    glTexCoord2f(1.0f, 0.0f);   glVertex3f(-1.0, 1.0, 1.0);
+    glEnd();
+    glPopMatrix();
+
+    glRotatef(90, 0, 1, 0);
+    glRotatef(-90, 1, 0, 0);
+
+    glPushMatrix();
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f);   glVertex3f(-1.0, -1.0, 1.0);
+    glTexCoord2f(0.0f, 1.0f);   glVertex3f(1.0, -1.0, 1.0);
+    glTexCoord2f(1.0f, 1.0f);   glVertex3f(1.0, 1.0, 1.0);
+    glTexCoord2f(1.0f, 0.0f);   glVertex3f(-1.0, 1.0, 1.0);
+    glEnd();
+    glPopMatrix();
+
+    glRotatef(180, 1, 0, 0);
 
     glPushMatrix();
     glBegin(GL_QUADS);
