@@ -42,6 +42,15 @@ struct
  **************************/
 void MakeCheckerboard(void);
 void DrawWorld(void);
+void Update(void);
+
+void Display(void);
+void RunMainLoop(int val);
+void KeyboardDown(unsigned char key, int x, int y);
+void KeyboardUp(unsigned char key, int x, int y);
+void SpecialDown(int key, int x, int y);
+void SpecialUp(int key, int x, int y);
+
 void CreateLight(void);
 
 void DrawSky(void);
