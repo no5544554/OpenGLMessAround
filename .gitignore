@@ -5,3 +5,5 @@ freeglut.dll
 *.save-failed
 *.cbp
 *.depend
+*.zip
+*.exe

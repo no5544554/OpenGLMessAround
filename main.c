@@ -23,11 +23,15 @@ BOOL leftArrow, rightArrow;
 #define DEG_TO_RAD 0.01745329
 #define NORMALIZED 0.707107
 
+struct
+{
+    int start;
+    int end;
+} timer;
 
-void Display(void)
+void DrawWorld(void)
 {
     int i;
-    double normalized = 0.2;
 
     glClearColor(0.2f, 0.5f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -123,7 +127,11 @@ void Display(void)
     glPopMatrix();
 */
     glFlush();
+}
 
+void Update(void)
+{
+    double normalized = 0.2;
     if ((keys['d'] || keys['a']) && (keys['w'] || keys['s']))
     {
         normalized = 0.2 * NORMALIZED;
@@ -174,9 +182,25 @@ void Display(void)
         pa -= 2.0f;
         if (pa < 0) pa += 360;
     }
+}
 
-    glutSwapBuffers();
+void Display(void)
+{
+
+    if (timer.start - timer.end >= 25)
+    {
+        Update();
+        DrawWorld();
+
+        timer.end = timer.start;
+
+        glutSwapBuffers();
+    }
+
+    timer.start = glutGet(GLUT_ELAPSED_TIME);
     glutPostRedisplay();
+
+
 }
 
 void RunMainLoop(int val)
