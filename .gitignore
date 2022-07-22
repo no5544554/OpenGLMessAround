@@ -7,3 +7,4 @@ freeglut.dll
 *.depend
 *.zip
 *.exe
+*.layout

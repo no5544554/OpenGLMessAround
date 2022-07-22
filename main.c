@@ -10,7 +10,7 @@
 #define SCREEN_HEIGHT 480
 #define FPS 60
 
-
+/* TODO: Turn into a struct */
 float px = 0.0f;
 float pz = 0.0f;
 float py = 1.0f;
@@ -33,14 +33,14 @@ void DrawWorld(void)
 {
     int i;
 
-    glClearColor(0.2f, 0.5f, 0.1f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(0, 640, 480, 0);
 
-
+    // Draw the sky
     glDisable(GL_LIGHTING);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -52,6 +52,15 @@ void DrawWorld(void)
     glVertex2f(0, 0);
     glEnd();
 
+    glColor3f(0.2f, 0.5f, 0.1f);
+    glBegin(GL_QUADS);
+    glVertex2f(0, 480);
+    glVertex2f(640, 480);
+    glVertex2f(640, 240);
+    glVertex2f(0, 240);
+    glEnd();
+
+    // Draw the world
     glClear(GL_DEPTH_BUFFER_BIT);
     glEnable(GL_LIGHTING);
     glMatrixMode(GL_PROJECTION);
@@ -63,11 +72,10 @@ void DrawWorld(void)
     glLoadIdentity();
     glRotatef(pa, 0.0f, 1.0f, 0.0f);
 
-    //gluLookAt(0.0, 1.0, 5.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0);
 
     glTranslatef(-px, -py, -pz);
 
-    //glPushMatrix();
+    // Draw grid
     glTranslatef(-10, -0.5, -10);
     for (i = 0; i < 40; i++)
     {
@@ -89,7 +97,7 @@ void DrawWorld(void)
         glPopMatrix();
     }
 
-    //glPopMatrix();
+    // Draw brown cylinder
     GLfloat mat_diffuse[] = { 0.8, 0.4, 0.3, 1.0 };
     GLfloat mat_ambient[] = { 0.3, 0.3, 0.3, 1.0 };
     glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
@@ -103,6 +111,7 @@ void DrawWorld(void)
     glutSolidCylinder(1.0, 1.0, 16, 1);
     glPopMatrix();
 
+    // Draw "gun"
     GLfloat mat_diffuse2[] = { 0.5, 0.4, 0.5, 1.0 };
     GLfloat mat_ambient2[] = { 0.3, 0.3, 0.3, 1.0 };
     glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse2);
