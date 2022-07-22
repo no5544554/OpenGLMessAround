@@ -8,7 +8,7 @@
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
-#define FPS 60
+#define FPS 50
 
 #define CHECKERBOARD_WIDTH  64
 #define CHECKERBOARD_HEIGHT 64
@@ -169,7 +169,7 @@ void Update(void)
 void Display(void)
 {
 
-    if (timer.start - timer.end >= 25)
+    if (timer.start - timer.end >= (1000 / FPS))
     {
         Update();
         DrawWorld();
