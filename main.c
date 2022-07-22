@@ -323,6 +323,7 @@ int main(int argc, char * argv[])
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CCW);
 
+    glutWarpPointer(glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT) / 2);
     glutDisplayFunc(Display);
     glutTimerFunc(1000 / FPS, RunMainLoop, 0);
     glutKeyboardFunc(KeyboardDown);
