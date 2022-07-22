@@ -71,7 +71,7 @@ void MakeCheckerboard(void)
     {
         for (x = 0; x < CHECKERBOARD_WIDTH; x++)
         {
-            c = ((((y&0x8)==0)^((x&0x8))==0))*255;
+            c = ((((y&0x8)==0)^(((x&0x8))==0))*255);
             checkerBoard[y * CHECKERBOARD_WIDTH + x][0] = (GLubyte) c;
             checkerBoard[y * CHECKERBOARD_WIDTH + x][1] = (GLubyte) c;
             checkerBoard[y * CHECKERBOARD_WIDTH + x][2] = (GLubyte) c;
@@ -280,6 +280,10 @@ void MouseMove(int x, int y)
     {
         pa += dx * 0.2f;
         pav += dy * 0.2f;
+
+        if (pav < -90) pav = -90;
+        if (pav > 90)  pav = 90;
+
         glutWarpPointer(centerX, centerY);
     }
 }
