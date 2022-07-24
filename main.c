@@ -6,6 +6,9 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#define DEG_TO_RAD 0.01745329
+#define NORMALIZED 0.707107
+
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 #define FPS 50
@@ -14,6 +17,14 @@
 
 #define CHECKERBOARD_WIDTH  64
 #define CHECKERBOARD_HEIGHT 64
+
+#define GRAVITY 0.01f
+
+#define PLAYER_SPEED 0.2f
+#define PLAYER_TURN_SPEED 2.0f
+#define PLAYER_JUMP_SPEED 0.02f
+
+
 static GLubyte checkerBoard[CHECKERBOARD_WIDTH * CHECKERBOARD_HEIGHT][4];
 
 
@@ -27,8 +38,6 @@ float pav = 0.0f;
 BOOL keys[256];
 BOOL leftArrow, rightArrow, upArrow, downArrow;
 
-#define DEG_TO_RAD 0.01745329
-#define NORMALIZED 0.707107
 
 static GLuint texture;
 
@@ -141,11 +150,11 @@ void Update(void)
     double normalized = 0.2;
     if ((keys['d'] || keys['a']) && (keys['w'] || keys['s']))
     {
-        normalized = 0.2 * NORMALIZED;
+        normalized = PLAYER_SPEED * NORMALIZED;
     }
     else
     {
-        normalized = 0.2;
+        normalized = PLAYER_SPEED;
     }
 
     if (keys['d'])
