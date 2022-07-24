@@ -20,9 +20,10 @@
 
 #define GRAVITY 0.003f
 
-#define PLAYER_SPEED 0.2f
+#define PLAYER_SPEED 0.1f
 #define PLAYER_TURN_SPEED 2.0f
 #define PLAYER_JUMP_SPEED 0.05f
+
 
 
 static GLubyte checkerBoard[CHECKERBOARD_WIDTH * CHECKERBOARD_HEIGHT][4];
@@ -38,8 +39,10 @@ float ph = 1.0f;
 float pvspeed = 0.0f;
 
 BOOL keys[256];
+BOOL keysPrev[256];
 BOOL leftArrow, rightArrow, upArrow, downArrow;
 
+BOOL toggleJump = TRUE;
 
 static GLuint texture;
 
@@ -152,23 +155,26 @@ void Update(void)
     double normalized = 0.2;
 
 
-
-    if (py > 0)
+    if (toggleJump)
     {
-        pvspeed -= GRAVITY;
-        if (pvspeed < -0.2f) pvspeed = -0.2f;
-    }
-    else
-    {
-        pvspeed = 0;
-        if (keys[' '])
+        if (py > 0)
         {
-            py = PLAYER_JUMP_SPEED;
-            pvspeed = PLAYER_JUMP_SPEED;
+            pvspeed -= GRAVITY;
+            if (pvspeed < -0.2f) pvspeed = -0.2f;
         }
+        else
+        {
+            pvspeed = 0;
+            if (keys[' '])
+            {
+                py = PLAYER_JUMP_SPEED;
+                pvspeed = PLAYER_JUMP_SPEED;
+            }
+        }
+
+        py += pvspeed;
     }
 
-    py += pvspeed;
 
 
     if ((keys['d'] || keys['a']) && (keys['w'] || keys['s']))
@@ -202,16 +208,23 @@ void Update(void)
         pz += normalized * cos(pa * DEG_TO_RAD);
     }
 
-    /*
-    if (keys['e'])
+    if (!toggleJump)
     {
-        py += 0.2f;
+        if (keys['e'])
+        {
+            py += 0.2f;
+        }
+        else if (keys['q'])
+        {
+            py -= 0.2f;
+        }
     }
-    else if (keys['q'])
+
+    if (keys['t'] && !keysPrev['t'])
     {
-        py -= 0.2f;
+        toggleJump = !toggleJump;
     }
-    */
+
 
     if (rightArrow)
     {
@@ -238,6 +251,8 @@ void Update(void)
     {
         glutLeaveMainLoop();
     }
+
+    memcpy(keysPrev, keys, sizeof(keys));
 }
 
 
