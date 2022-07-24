@@ -18,11 +18,11 @@
 #define CHECKERBOARD_WIDTH  64
 #define CHECKERBOARD_HEIGHT 64
 
-#define GRAVITY 0.01f
+#define GRAVITY 0.003f
 
 #define PLAYER_SPEED 0.2f
 #define PLAYER_TURN_SPEED 2.0f
-#define PLAYER_JUMP_SPEED 0.02f
+#define PLAYER_JUMP_SPEED 0.05f
 
 
 static GLubyte checkerBoard[CHECKERBOARD_WIDTH * CHECKERBOARD_HEIGHT][4];
@@ -31,9 +31,11 @@ static GLubyte checkerBoard[CHECKERBOARD_WIDTH * CHECKERBOARD_HEIGHT][4];
 /* TODO: Turn into a struct */
 float px  = 0.0f;
 float pz  = 0.0f;
-float py  = 1.0f;
+float py  = 0.0f;
 float pa  = 0.0f;
 float pav = 0.0f;
+float ph = 1.0f;
+float pvspeed = 0.0f;
 
 BOOL keys[256];
 BOOL leftArrow, rightArrow, upArrow, downArrow;
@@ -114,7 +116,7 @@ void DrawWorld(void)
     glLoadIdentity();
     glRotatef(pav, 1.0f, 0.0f, 0.0f);
     glRotatef(pa, 0.0f, 1.0f, 0.0f);
-    glTranslatef(-px, -py, -pz);
+    glTranslatef(-px, (-py) - ph, -pz);
 
     /* Draw the ground*/
     glColor3f(0.2f, 0.5f, 0.1f);
@@ -148,6 +150,27 @@ void DrawWorld(void)
 void Update(void)
 {
     double normalized = 0.2;
+
+
+
+    if (py > 0)
+    {
+        pvspeed -= GRAVITY;
+        if (pvspeed < -0.2f) pvspeed = -0.2f;
+    }
+    else
+    {
+        pvspeed = 0;
+        if (keys[' '])
+        {
+            py = PLAYER_JUMP_SPEED;
+            pvspeed = PLAYER_JUMP_SPEED;
+        }
+    }
+
+    py += pvspeed;
+
+
     if ((keys['d'] || keys['a']) && (keys['w'] || keys['s']))
     {
         normalized = PLAYER_SPEED * NORMALIZED;
@@ -179,6 +202,7 @@ void Update(void)
         pz += normalized * cos(pa * DEG_TO_RAD);
     }
 
+    /*
     if (keys['e'])
     {
         py += 0.2f;
@@ -187,6 +211,7 @@ void Update(void)
     {
         py -= 0.2f;
     }
+    */
 
     if (rightArrow)
     {
