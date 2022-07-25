@@ -30,8 +30,8 @@ static GLubyte checkerBoard[CHECKERBOARD_WIDTH * CHECKERBOARD_HEIGHT][4];
 
 
 /* TODO: Turn into a struct */
-float px  = 0.0f;
-float pz  = 0.0f;
+float px  = 2.0f;
+float pz  = 10.0f;
 float py  = 0.0f;
 float pa  = 0.0f;
 float pav = 0.0f;
@@ -165,7 +165,7 @@ void Update(void)
         else
         {
             pvspeed = 0;
-            if (keys[' '])
+            if (keys[' '] && !keysPrev[' '])
             {
                 py = PLAYER_JUMP_SPEED;
                 pvspeed = PLAYER_JUMP_SPEED;
@@ -432,7 +432,7 @@ void DrawSky(void)
 void DrawGrid(void)
 {
     int i;
-
+    glPushMatrix();
     glTranslatef(-10, -0.5, -10);
     for (i = 0; i < 40; i++)
     {
@@ -453,6 +453,7 @@ void DrawGrid(void)
         glEnd();
         glPopMatrix();
     }
+    glPopMatrix();
 }
 
 
@@ -497,7 +498,7 @@ void DrawCube(void)
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
     glBindTexture(GL_TEXTURE_2D, texture);
     glPushMatrix();
-    glTranslatef(-5, 2, 0);
+    glTranslatef(-4, 2, -2);
 
     glPushMatrix();
     glBegin(GL_QUADS);
